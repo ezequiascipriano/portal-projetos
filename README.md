@@ -51,7 +51,7 @@ Sistema de gerenciamento de projetos, tarefas e incidentes desenvolvido em Flask
 
 1. **Clone o repositório**
    ```bash
-   git clone https://github.com/seu-usuario/portal-projetos.git
+   git clone https://github.com/ezequiascipriano/portal-projetos.git
    cd portal-projetos
    ```
 
@@ -194,8 +194,8 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ## 👨‍💻 Autor
 
-**Seu Nome**
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
+**Ezequias Cipriano**
+- GitHub: [@ezequiascipriano](https://github.com/ezequiascipriano)
 
 ## 📞 Suporte
 
@@ -203,4 +203,4 @@ Se você encontrar algum problema ou tiver dúvidas, abra uma issue no repositó
 
 ---
 
-**Portal de Projetos** - Sistema completo de gerenciamento de projetos, tarefas e incidentes. 
+**Portal de Projetos** - Sistema completo de gerenciamento de projetos, tarefas e incidentes.
