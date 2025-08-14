@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ titulo }}</h1>
+        <a href="{{ url_for('listar_usuarios') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Dados do Usuário</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="login" class="form-label">Login *</label>
+                            <input type="text" class="form-control" id="login" name="login" 
+                                   value="{{ usuario.login if usuario else '' }}" 
+                                   required maxlength="50">
+                            <div class="form-text">Login único para acesso ao sistema</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="nome_completo" class="form-label">Nome Completo *</label>
+                            <input type="text" class="form-control" id="nome_completo" name="nome_completo" 
+                                   value="{{ usuario.nome_completo if usuario else '' }}" 
+                                   required maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ usuario.email if usuario else '' }}" 
+                                   required maxlength="120">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="id_perfil" class="form-label">Perfil *</label>
+                            <select class="form-control" id="id_perfil" name="id_perfil" required>
+                                <option value="">Selecione um perfil</option>
+                                {% for perfil in perfis %}
+                                <option value="{{ perfil.id_perfil }}" 
+                                        {{ 'selected' if usuario and usuario.id_perfil == perfil.id_perfil else '' }}>
+                                    {{ perfil.nome }} - {{ perfil.descricao }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="senha" class="form-label">
+                                Senha {% if usuario %}(deixe em branco para manter a atual){% else %}*{% endif %}
+                            </label>
+                            <input type="password" class="form-control" id="senha" name="senha" 
+                                   {{ 'required' if not usuario else '' }} minlength="6">
+                            <div class="form-text">
+                                {% if usuario %}
+                                    Mínimo 6 caracteres. Deixe em branco para manter a senha atual.
+                                {% else %}
+                                    Mínimo 6 caracteres
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="ATIVO" {{ 'selected' if not usuario or usuario.status == 'ATIVO' else '' }}>
+                                    Ativo
+                                </option>
+                                <option value="INATIVO" {{ 'selected' if usuario and usuario.status == 'INATIVO' else '' }}>
+                                    Inativo
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {% if usuario %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Data de Criação</label>
+                            <input type="text" class="form-control" 
+                                   value="{{ usuario.data_criacao.strftime('%d/%m/%Y %H:%M') if usuario.data_criacao else '-' }}" 
+                                   readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Último Login</label>
+                            <input type="text" class="form-control" 
+                                   value="{{ usuario.ultimo_login.strftime('%d/%m/%Y %H:%M') if usuario.ultimo_login else 'Nunca' }}" 
+                                   readonly>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('listar_usuarios') }}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 
+                                {% if usuario %}Atualizar{% else %}Criar{% endif %} Usuário
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validação do formulário
+document.querySelector('form').addEventListener('submit', function(e) {
+    const login = document.getElementById('login').value.trim();
+    const nomeCompleto = document.getElementById('nome_completo').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const perfil = document.getElementById('id_perfil').value;
+    const senha = document.getElementById('senha').value;
+    const status = document.getElementById('status').value;
+    
+    let isValid = true;
+    let errorMessage = '';
+    
+    // Validar campos obrigatórios
+    if (!login) {
+        errorMessage += 'Login é obrigatório.\n';
+        isValid = false;
+    }
+    
+    if (!nomeCompleto) {
+        errorMessage += 'Nome completo é obrigatório.\n';
+        isValid = false;
+    }
+    
+    if (!email) {
+        errorMessage += 'Email é obrigatório.\n';
+        isValid = false;
+    } else if (!isValidEmail(email)) {
+        errorMessage += 'Email inválido.\n';
+        isValid = false;
+    }
+    
+    if (!perfil) {
+        errorMessage += 'Perfil é obrigatório.\n';
+        isValid = false;
+    }
+    
+    if (!status) {
+        errorMessage += 'Status é obrigatório.\n';
+        isValid = false;
+    }
+    
+    // Validar senha apenas para novos usuários
+    {% if not usuario %}
+    if (!senha) {
+        errorMessage += 'Senha é obrigatória.\n';
+        isValid = false;
+    } else if (senha.length < 6) {
+        errorMessage += 'Senha deve ter pelo menos 6 caracteres.\n';
+        isValid = false;
+    }
+    {% endif %}
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Por favor, corrija os seguintes erros:\n\n' + errorMessage);
+    }
+});
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Incidentes</h2>
+        <a href="{{ url_for('criar_incidente') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Incidente
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="ABERTO" {% if request.args.get('status') == 'ABERTO' %}selected{% endif %}>Aberto</option>
+                        <option value="EM_ANÁLISE" {% if request.args.get('status') == 'EM_ANÁLISE' %}selected{% endif %}>Em Análise</option>
+                        <option value="EM_ANDAMENTO" {% if request.args.get('status') == 'EM_ANDAMENTO' %}selected{% endif %}>Em Andamento</option>
+                        <option value="RESOLVIDO" {% if request.args.get('status') == 'RESOLVIDO' %}selected{% endif %}>Resolvido</option>
+                        <option value="FECHADO" {% if request.args.get('status') == 'FECHADO' %}selected{% endif %}>Fechado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="prioridade" class="form-label">Prioridade</label>
+                    <select name="prioridade" id="prioridade" class="form-select">
+                        <option value="">Todas</option>
+                        <option value="ALTA" {% if request.args.get('prioridade') == 'ALTA' %}selected{% endif %}>Alta</option>
+                        <option value="MÉDIA" {% if request.args.get('prioridade') == 'MÉDIA' %}selected{% endif %}>Média</option>
+                        <option value="BAIXA" {% if request.args.get('prioridade') == 'BAIXA' %}selected{% endif %}>Baixa</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="busca" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="busca" name="busca" 
+                           value="{{ request.args.get('busca', '') }}" 
+                           placeholder="Buscar por título, descrição ou projeto...">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Incidentes -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Projeto</th>
+                            <th>Título</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Última Atualização</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for incidente in incidentes %}
+                        <tr>
+                            <td>{{ incidente.id_incidente }}</td>
+                            <td>{{ incidente.projeto.codigo_projeto }} - {{ incidente.projeto.nome_projeto }}</td>
+                            <td>{{ incidente.titulo }}</td>
+                            <td>
+                                <span class="badge {% if incidente.prioridade == 'ALTA' %}bg-danger
+                                                  {% elif incidente.prioridade == 'MÉDIA' %}bg-warning
+                                                  {% else %}bg-info{% endif %}">
+                                    {{ incidente.prioridade }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if incidente.status == 'ABERTO' %}bg-warning
+                                                  {% elif incidente.status == 'EM_ANÁLISE' %}bg-info
+                                                  {% elif incidente.status == 'EM_ANDAMENTO' %}bg-primary
+                                                  {% elif incidente.status == 'RESOLVIDO' %}bg-success
+                                                  {% else %}bg-secondary{% endif %}">
+                                    {{ incidente.status }}
+                                </span>
+                            </td>
+                            <td>{{ incidente.data_ultima_atualizacao.strftime('%d/%m/%Y %H:%M') if incidente.data_ultima_atualizacao else 'Não atualizado' }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('editar_incidente', id=incidente.id_incidente) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#confirmModal{{ incidente.id_incidente }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Modal de Confirmação -->
+                                <div class="modal fade" id="confirmModal{{ incidente.id_incidente }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirmar Exclusão</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Tem certeza que deseja excluir o incidente #{{ incidente.id_incidente }}?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="POST" action="{{ url_for('excluir_incidente', id=incidente.id_incidente) }}">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <button type="submit" class="btn btn-danger">Excluir</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Nenhum incidente encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Navegação de páginas" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('listar_incidentes', page=pagination.prev_num, **request.args) }}">
+                            Anterior
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for page in pagination.iter_pages() %}
+                        {% if page %}
+                            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('listar_incidentes', page=page, **request.args) }}">
+                                    {{ page }}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('listar_incidentes', page=pagination.next_num, **request.args) }}">
+                            Próxima
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

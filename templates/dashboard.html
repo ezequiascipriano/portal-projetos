@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+    
+    <!-- Cards de Projetos -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total de Projetos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-projetos">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-project-diagram fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Projetos Ativos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="projetos-ativos">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Projetos Concluídos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="projetos-concluidos">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-flag-checkered fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Projetos Cancelados</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="projetos-cancelados">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Incidentes -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total de Incidentes</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-incidentes">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Incidentes Abertos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="incidentes-abertos">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Incidentes em Andamento</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="incidentes-andamento">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-spinner fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Incidentes Resolvidos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="incidentes-resolvidos">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row">
+        <!-- Gráfico de Projetos por Situação -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Projetos por Situação</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="grafico-projetos"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Incidentes por Status -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Incidentes por Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="grafico-incidentes"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabelas Recentes -->
+    <div class="row">
+        <!-- Últimos Projetos -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Últimos Projetos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Situação</th>
+                                    <th>Última Atualização</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ultimos-projetos">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimos Incidentes -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Últimos Incidentes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Projeto</th>
+                                    <th>Status</th>
+                                    <th>Última Atualização</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ultimos-incidentes">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Função para formatar data
+function formatarData(data) {
+    if (!data) return 'Não atualizado';
+    const d = new Date(data);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+}
+
+// Função para atualizar os dados do dashboard
+function atualizarDashboard() {
+    fetch('/api/dashboard/stats')
+        .then(response => response.json())
+        .then(data => {
+            // Atualizar contadores de projetos
+            document.getElementById('total-projetos').textContent = data.total_projetos;
+            document.getElementById('projetos-ativos').textContent = data.projetos_ativos;
+            document.getElementById('projetos-concluidos').textContent = data.projetos_concluidos;
+            document.getElementById('projetos-cancelados').textContent = data.projetos_cancelados;
+
+            // Atualizar contadores de incidentes
+            document.getElementById('total-incidentes').textContent = data.total_incidentes;
+            document.getElementById('incidentes-abertos').textContent = data.incidentes_abertos;
+            document.getElementById('incidentes-andamento').textContent = data.incidentes_em_andamento;
+            document.getElementById('incidentes-resolvidos').textContent = data.incidentes_resolvidos;
+
+            // Atualizar tabela de últimos projetos
+            const tabelaProjetos = document.getElementById('ultimos-projetos');
+            tabelaProjetos.innerHTML = '';
+            data.ultimos_projetos.forEach(projeto => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${projeto.codigo_projeto}</td>
+                    <td>${projeto.nome_projeto}</td>
+                    <td>
+                        <span class="badge ${projeto.situacao_projeto === 'ATIVO' ? 'bg-success' : 
+                                          projeto.situacao_projeto === 'CONCLUIDO' ? 'bg-info' : 'bg-danger'}">
+                            ${projeto.situacao_projeto}
+                        </span>
+                    </td>
+                    <td>${formatarData(projeto.data_ultima_atualizacao)}</td>
+                `;
+                tabelaProjetos.appendChild(tr);
+            });
+
+            // Atualizar tabela de últimos incidentes
+            const tabelaIncidentes = document.getElementById('ultimos-incidentes');
+            tabelaIncidentes.innerHTML = '';
+            data.ultimos_incidentes.forEach(incidente => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${incidente.titulo}</td>
+                    <td>${incidente.projeto.codigo_projeto} - ${incidente.projeto.nome_projeto}</td>
+                    <td>
+                        <span class="badge ${incidente.status === 'ABERTO' ? 'bg-warning' :
+                                          incidente.status === 'EM_ANDAMENTO' ? 'bg-info' :
+                                          incidente.status === 'RESOLVIDO' ? 'bg-success' : 'bg-secondary'}">
+                            ${incidente.status}
+                        </span>
+                    </td>
+                    <td>${formatarData(incidente.data_ultima_atualizacao)}</td>
+                `;
+                tabelaIncidentes.appendChild(tr);
+            });
+
+            // Atualizar gráfico de projetos
+            const ctxProjetos = document.getElementById('grafico-projetos').getContext('2d');
+            new Chart(ctxProjetos, {
+                type: 'pie',
+                data: {
+                    labels: ['Ativos', 'Concluídos', 'Cancelados'],
+                    datasets: [{
+                        data: [
+                            data.projetos_ativos,
+                            data.projetos_concluidos,
+                            data.projetos_cancelados
+                        ],
+                        backgroundColor: [
+                            '#1cc88a',  // Verde para Ativos
+                            '#36b9cc',  // Azul para Concluídos
+                            '#e74a3b'   // Vermelho para Cancelados
+                        ]
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Atualizar gráfico de incidentes
+            const ctxIncidentes = document.getElementById('grafico-incidentes').getContext('2d');
+            new Chart(ctxIncidentes, {
+                type: 'pie',
+                data: {
+                    labels: ['Abertos', 'Em Andamento', 'Resolvidos'],
+                    datasets: [{
+                        data: [
+                            data.incidentes_abertos,
+                            data.incidentes_em_andamento,
+                            data.incidentes_resolvidos
+                        ],
+                        backgroundColor: [
+                            '#f6c23e',  // Amarelo para Abertos
+                            '#36b9cc',  // Azul para Em Andamento
+                            '#1cc88a'   // Verde para Resolvidos
+                        ]
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+}
+
+// Atualizar dashboard a cada 30 segundos
+atualizarDashboard();
+setInterval(atualizarDashboard, 30000);
+</script>
+{% endblock %} 

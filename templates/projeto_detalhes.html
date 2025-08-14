@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Detalhes do Projeto</h1>
+        <div>
+            <a href="{{ url_for('editar_projeto', id=projeto.id_projeto) }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm me-2">
+                <i class="fas fa-edit fa-sm text-white-50"></i> Editar Projeto
+            </a>
+            <a href="{{ url_for('listar_projetos') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Informações do Projeto -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações do Projeto</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Código do Projeto:</strong><br>
+                            <span class="badge bg-info fs-6">{{ projeto.codigo_projeto }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Nome do Projeto:</strong><br>
+                            <span class="fs-6">{{ projeto.nome_projeto }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Situação:</strong><br>
+                            {% if projeto.situacao_projeto == 'ATIVO' %}
+                                <span class="badge bg-success">{{ projeto.situacao_projeto }}</span>
+                            {% elif projeto.situacao_projeto == 'CONCLUIDO' %}
+                                <span class="badge bg-info">{{ projeto.situacao_projeto }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ projeto.situacao_projeto }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Controle Econômico:</strong><br>
+                            <span>{{ projeto.controle_economico }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Número da Iniciativa:</strong><br>
+                            <span>{{ projeto.numero_iniciativa }}</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Data de Criação:</strong><br>
+                            <span>{{ projeto.data_criacao.strftime('%d/%m/%Y %H:%M') if projeto.data_criacao else '-' }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Última Atualização:</strong><br>
+                            <span>{{ projeto.data_ultima_atualizacao.strftime('%d/%m/%Y %H:%M') if projeto.data_ultima_atualizacao else '-' }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Criado por:</strong><br>
+                            <span>{{ projeto.criador.nome_completo if projeto.criador else '-' }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Atualizado por:</strong><br>
+                            <span>{{ projeto.atualizador.nome_completo if projeto.atualizador else '-' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Tarefas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ tarefas|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Tarefas Concluídas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ tarefas|selectattr('status', 'equalto', 'CONCLUIDA')|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Tarefas Pendentes</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ tarefas|selectattr('status', 'equalto', 'PENDENTE')|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Total de Incidentes</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ incidentes|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarefas do Projeto -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Tarefas do Projeto</h6>
+                    <a href="{{ url_for('criar_tarefa') }}?projeto={{ projeto.id_projeto }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus fa-sm"></i> Nova Tarefa
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if tarefas %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título</th>
+                                    <th>Responsável</th>
+                                    <th>Prioridade</th>
+                                    <th>Status</th>
+                                    <th>Data Limite</th>
+                                    <th>Data Criação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tarefa in tarefas %}
+                                <tr>
+                                    <td>{{ tarefa.id_tarefa }}</td>
+                                    <td>
+                                        <strong>{{ tarefa.titulo }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ tarefa.descricao[:50] }}{% if tarefa.descricao|length > 50 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        {% if tarefa.responsavel %}
+                                            {{ tarefa.responsavel.nome_completo }}
+                                        {% else %}
+                                            <span class="text-muted">Não atribuído</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if tarefa.prioridade == 'ALTA' %}
+                                            <span class="badge bg-danger">{{ tarefa.prioridade }}</span>
+                                        {% elif tarefa.prioridade == 'MÉDIA' %}
+                                            <span class="badge bg-warning">{{ tarefa.prioridade }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ tarefa.prioridade }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if tarefa.status == 'PENDENTE' %}
+                                            <span class="badge bg-secondary">{{ tarefa.status }}</span>
+                                        {% elif tarefa.status == 'EM_ANDAMENTO' %}
+                                            <span class="badge bg-info">{{ tarefa.status }}</span>
+                                        {% elif tarefa.status == 'CONCLUIDA' %}
+                                            <span class="badge bg-success">{{ tarefa.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ tarefa.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if tarefa.data_limite %}
+                                            {{ tarefa.data_limite.strftime('%d/%m/%Y') }}
+                                        {% else %}
+                                            <span class="text-muted">Não definida</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ tarefa.data_criacao.strftime('%d/%m/%Y %H:%M') if tarefa.data_criacao else '-' }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('editar_tarefa', id=tarefa.id_tarefa) }}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-tasks fa-3x text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">Nenhuma tarefa encontrada para este projeto.</p>
+                        <a href="{{ url_for('criar_tarefa') }}?projeto={{ projeto.id_projeto }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Criar Primeira Tarefa
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incidentes do Projeto -->
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Incidentes do Projeto</h6>
+                    <a href="{{ url_for('criar_incidente') }}?projeto={{ projeto.id_projeto }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus fa-sm"></i> Novo Incidente
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if incidentes %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título</th>
+                                    <th>Prioridade</th>
+                                    <th>Status</th>
+                                    <th>Criado por</th>
+                                    <th>Data Criação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for incidente in incidentes %}
+                                <tr>
+                                    <td>{{ incidente.id_incidente }}</td>
+                                    <td>
+                                        <strong>{{ incidente.titulo }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ incidente.descricao[:50] }}{% if incidente.descricao|length > 50 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        {% if incidente.prioridade == 'ALTA' %}
+                                            <span class="badge bg-danger">{{ incidente.prioridade }}</span>
+                                        {% elif incidente.prioridade == 'MÉDIA' %}
+                                            <span class="badge bg-warning">{{ incidente.prioridade }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ incidente.prioridade }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if incidente.status == 'ABERTO' %}
+                                            <span class="badge bg-danger">{{ incidente.status }}</span>
+                                        {% elif incidente.status == 'EM_ANÁLISE' %}
+                                            <span class="badge bg-warning">{{ incidente.status }}</span>
+                                        {% elif incidente.status == 'EM_ANDAMENTO' %}
+                                            <span class="badge bg-info">{{ incidente.status }}</span>
+                                        {% elif incidente.status == 'RESOLVIDO' %}
+                                            <span class="badge bg-success">{{ incidente.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ incidente.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ incidente.criador.nome_completo if incidente.criador else '-' }}</td>
+                                    <td>{{ incidente.data_criacao.strftime('%d/%m/%Y %H:%M') if incidente.data_criacao else '-' }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('editar_incidente', id=incidente.id_incidente) }}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-3x text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">Nenhum incidente encontrado para este projeto.</p>
+                        <a href="{{ url_for('criar_incidente') }}?projeto={{ projeto.id_projeto }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Criar Primeiro Incidente
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">{{ titulo }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="codigo_projeto" class="form-label">Código do Projeto *</label>
+                            <input type="text" class="form-control" id="codigo_projeto" name="codigo_projeto" 
+                                   value="{{ projeto.codigo_projeto if projeto else '' }}" required
+                                   pattern="^PRJ\d{6}$"
+                                   placeholder="PRJ000000">
+                            <div class="invalid-feedback">
+                                Por favor, informe um código de projeto válido no formato PRJ000000.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nome_projeto" class="form-label">Nome do Projeto *</label>
+                            <input type="text" class="form-control" id="nome_projeto" name="nome_projeto" 
+                                   value="{{ projeto.nome_projeto if projeto else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, informe o nome do projeto.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="controle_economico" class="form-label">Controle Econômico (CE) *</label>
+                            <input type="text" class="form-control" id="controle_economico" name="controle_economico" 
+                                   value="{{ projeto.controle_economico if projeto else '' }}" required
+                                   pattern="^[A-Za-z0-9-]+$">
+                            <div class="invalid-feedback">
+                                Por favor, informe um CE válido (apenas letras, números e hífen).
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="numero_iniciativa" class="form-label">Número da Iniciativa *</label>
+                            <input type="text" class="form-control" id="numero_iniciativa" name="numero_iniciativa" 
+                                   value="{{ projeto.numero_iniciativa if projeto else '' }}" required
+                                   pattern="^[A-Za-z0-9-]+$">
+                            <div class="invalid-feedback">
+                                Por favor, informe um número de iniciativa válido (apenas letras, números e hífen).
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="situacao_projeto" class="form-label">Situação do Projeto *</label>
+                            <select class="form-select" id="situacao_projeto" name="situacao_projeto" required>
+                                <option value="">Selecione uma situação</option>
+                                <option value="ATIVO" {% if projeto and projeto.situacao_projeto == 'ATIVO' %}selected{% endif %}>
+                                    Ativo
+                                </option>
+                                <option value="CONCLUIDO" {% if projeto and projeto.situacao_projeto == 'CONCLUIDO' %}selected{% endif %}>
+                                    Concluído
+                                </option>
+                                <option value="CANCELADO" {% if projeto and projeto.situacao_projeto == 'CANCELADO' %}selected{% endif %}>
+                                    Cancelado
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, selecione uma situação para o projeto.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('listar_projetos') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validação do formulário
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %} 

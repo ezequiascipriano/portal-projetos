@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">{{ titulo }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="id_projeto" class="form-label">Projeto *</label>
+                                <select class="form-select" id="id_projeto" name="id_projeto" required>
+                                    <option value="">Selecione um projeto</option>
+                                    {% for projeto in projetos %}
+                                    <option value="{{ projeto.id_projeto }}" 
+                                            {% if (incidente and incidente.id_projeto == projeto.id_projeto) or (projeto_selecionado and projeto_selecionado|int == projeto.id_projeto) %}selected{% endif %}>
+                                        {{ projeto.codigo_projeto }} - {{ projeto.nome_projeto }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione um projeto.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="prioridade" class="form-label">Prioridade *</label>
+                                <select class="form-select" id="prioridade" name="prioridade" required>
+                                    <option value="">Selecione uma prioridade</option>
+                                    <option value="ALTA" {% if incidente and incidente.prioridade == 'ALTA' %}selected{% endif %}>Alta</option>
+                                    <option value="MÉDIA" {% if incidente and incidente.prioridade == 'MÉDIA' %}selected{% endif %}>Média</option>
+                                    <option value="BAIXA" {% if incidente and incidente.prioridade == 'BAIXA' %}selected{% endif %}>Baixa</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione uma prioridade.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="titulo" class="form-label">Título *</label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" 
+                                   value="{{ incidente.titulo if incidente else '' }}" required
+                                   placeholder="Digite um título descritivo para o incidente">
+                            <div class="invalid-feedback">
+                                Por favor, informe o título do incidente.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição *</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="4" required
+                                    placeholder="Descreva detalhadamente o incidente, incluindo passos para reproduzir o problema">{{ incidente.descricao if incidente else '' }}</textarea>
+                            <div class="invalid-feedback">
+                                Por favor, informe a descrição do incidente.
+                            </div>
+                        </div>
+
+                        {% if incidente %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Status *</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="ABERTO" {% if incidente.status == 'ABERTO' %}selected{% endif %}>Aberto</option>
+                                    <option value="EM_ANÁLISE" {% if incidente.status == 'EM_ANÁLISE' %}selected{% endif %}>Em Análise</option>
+                                    <option value="EM_ANDAMENTO" {% if incidente.status == 'EM_ANDAMENTO' %}selected{% endif %}>Em Andamento</option>
+                                    <option value="RESOLVIDO" {% if incidente.status == 'RESOLVIDO' %}selected{% endif %}>Resolvido</option>
+                                    <option value="FECHADO" {% if incidente.status == 'FECHADO' %}selected{% endif %}>Fechado</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione o status do incidente.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="data_resolucao" class="form-label">Data de Resolução</label>
+                                <input type="datetime-local" class="form-control" id="data_resolucao" name="data_resolucao"
+                                       value="{{ incidente.data_resolucao.strftime('%Y-%m-%dT%H:%M') if incidente and incidente.data_resolucao else '' }}"
+                                       {% if not incidente or incidente.status not in ['RESOLVIDO', 'FECHADO'] %}disabled{% endif %}>
+                                <div class="form-text">
+                                    A data de resolução será preenchida automaticamente ao marcar como Resolvido ou Fechado.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="solucao" class="form-label">Solução</label>
+                            <textarea class="form-control" id="solucao" name="solucao" rows="4"
+                                    placeholder="Descreva a solução aplicada para resolver o incidente"
+                                    {% if not incidente or incidente.status not in ['RESOLVIDO', 'FECHADO'] %}disabled{% endif %}>{{ incidente.solucao if incidente else '' }}</textarea>
+                            <div class="form-text">
+                                Descreva a solução quando o incidente for resolvido.
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('listar_incidentes') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validação do formulário
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Habilitar/desabilitar campos de resolução
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.getElementById('status');
+    const dataResolucaoInput = document.getElementById('data_resolucao');
+    const solucaoTextarea = document.getElementById('solucao');
+
+    if (statusSelect && dataResolucaoInput && solucaoTextarea) {
+        statusSelect.addEventListener('change', function() {
+            const isResolvido = ['RESOLVIDO', 'FECHADO'].includes(this.value);
+            dataResolucaoInput.disabled = !isResolvido;
+            solucaoTextarea.disabled = !isResolvido;
+            
+            if (isResolvido && !dataResolucaoInput.value) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                dataResolucaoInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ titulo }}</h1>
+        <a href="{{ url_for('listar_tarefas') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Dados da Tarefa</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="titulo" class="form-label">Título *</label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" 
+                                   value="{{ tarefa.titulo if tarefa else '' }}" 
+                                   required maxlength="200">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="id_projeto" class="form-label">Projeto *</label>
+                            <select class="form-control" id="id_projeto" name="id_projeto" required>
+                                <option value="">Selecione um projeto</option>
+                                {% for projeto in projetos %}
+                                <option value="{{ projeto.id_projeto }}" 
+                                        {{ 'selected' if (tarefa and tarefa.id_projeto == projeto.id_projeto) or (projeto_selecionado and projeto_selecionado|int == projeto.id_projeto) else '' }}>
+                                    {{ projeto.codigo_projeto }} - {{ projeto.nome_projeto }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição *</label>
+                            <textarea class="form-control" id="descricao" name="descricao" 
+                                      rows="4" required>{{ tarefa.descricao if tarefa else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="prioridade" class="form-label">Prioridade *</label>
+                            <select class="form-control" id="prioridade" name="prioridade" required>
+                                <option value="">Selecione a prioridade</option>
+                                <option value="ALTA" {{ 'selected' if tarefa and tarefa.prioridade == 'ALTA' else '' }}>
+                                    Alta
+                                </option>
+                                <option value="MÉDIA" {{ 'selected' if tarefa and tarefa.prioridade == 'MÉDIA' else '' }}>
+                                    Média
+                                </option>
+                                <option value="BAIXA" {{ 'selected' if tarefa and tarefa.prioridade == 'BAIXA' else '' }}>
+                                    Baixa
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="PENDENTE" {{ 'selected' if not tarefa or tarefa.status == 'PENDENTE' else '' }}>
+                                    Pendente
+                                </option>
+                                <option value="EM_ANDAMENTO" {{ 'selected' if tarefa and tarefa.status == 'EM_ANDAMENTO' else '' }}>
+                                    Em Andamento
+                                </option>
+                                <option value="CONCLUIDA" {{ 'selected' if tarefa and tarefa.status == 'CONCLUIDA' else '' }}>
+                                    Concluída
+                                </option>
+                                <option value="CANCELADA" {{ 'selected' if tarefa and tarefa.status == 'CANCELADA' else '' }}>
+                                    Cancelada
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="id_usuario_responsavel" class="form-label">Responsável</label>
+                            <select class="form-control" id="id_usuario_responsavel" name="id_usuario_responsavel">
+                                <option value="">Selecione um responsável</option>
+                                {% for usuario in usuarios %}
+                                <option value="{{ usuario.id_usuario }}" 
+                                        {{ 'selected' if tarefa and tarefa.id_usuario_responsavel == usuario.id_usuario else '' }}>
+                                    {{ usuario.nome_completo }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label for="data_limite" class="form-label">Data Limite</label>
+                            <input type="date" class="form-control" id="data_limite" name="data_limite" 
+                                   value="{{ tarefa.data_limite.strftime('%Y-%m-%d') if tarefa and tarefa.data_limite else '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                {% if tarefa %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Data de Criação</label>
+                            <input type="text" class="form-control" 
+                                   value="{{ tarefa.data_criacao.strftime('%d/%m/%Y %H:%M') if tarefa.data_criacao else '-' }}" 
+                                   readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Última Atualização</label>
+                            <input type="text" class="form-control" 
+                                   value="{{ tarefa.data_ultima_atualizacao.strftime('%d/%m/%Y %H:%M') if tarefa.data_ultima_atualizacao else '-' }}" 
+                                   readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Data de Conclusão</label>
+                            <input type="text" class="form-control" 
+                                   value="{{ tarefa.data_conclusao.strftime('%d/%m/%Y %H:%M') if tarefa.data_conclusao else '-' }}" 
+                                   readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Criado por</label>
+                            <input type="text" class="form-control" 
+                                   value="{{ tarefa.criador.nome_completo if tarefa.criador else '-' }}" 
+                                   readonly>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('listar_tarefas') }}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 
+                                {% if tarefa %}Atualizar{% else %}Criar{% endif %} Tarefa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validação do formulário
+document.querySelector('form').addEventListener('submit', function(e) {
+    const titulo = document.getElementById('titulo').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const prioridade = document.getElementById('prioridade').value;
+    const status = document.getElementById('status').value;
+    const projeto = document.getElementById('id_projeto').value;
+    const dataLimite = document.getElementById('data_limite').value;
+    
+    let isValid = true;
+    let errorMessage = '';
+    
+    // Validar campos obrigatórios
+    if (!titulo) {
+        errorMessage += 'Título é obrigatório.\n';
+        isValid = false;
+    }
+    
+    if (!descricao) {
+        errorMessage += 'Descrição é obrigatória.\n';
+        isValid = false;
+    }
+    
+    if (!prioridade) {
+        errorMessage += 'Prioridade é obrigatória.\n';
+        isValid = false;
+    }
+    
+    if (!status) {
+        errorMessage += 'Status é obrigatório.\n';
+        isValid = false;
+    }
+    
+    if (!projeto) {
+        errorMessage += 'Projeto é obrigatório.\n';
+        isValid = false;
+    }
+    
+    // Validar data limite (se fornecida)
+    if (dataLimite) {
+        const dataLimiteObj = new Date(dataLimite);
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        if (dataLimiteObj < hoje) {
+            errorMessage += 'Data limite não pode ser anterior a hoje.\n';
+            isValid = false;
+        }
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Por favor, corrija os seguintes erros:\n\n' + errorMessage);
+    }
+});
+
+// Atualizar data de conclusão automaticamente quando status for CONCLUIDA
+document.getElementById('status').addEventListener('change', function() {
+    const status = this.value;
+    const dataConclusaoField = document.querySelector('input[readonly]');
+    
+    if (status === 'CONCLUIDA' && dataConclusaoField) {
+        const hoje = new Date();
+        const dataFormatada = hoje.toLocaleDateString('pt-BR') + ' ' + hoje.toLocaleTimeString('pt-BR');
+        dataConclusaoField.value = dataFormatada;
+    }
+});
+</script>
+{% endblock %}

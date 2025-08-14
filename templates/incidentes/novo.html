@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">Novo Incidente</h1>
+        <a href="{{ url_for('listar_incidentes') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="POST">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="projeto_id" class="form-label">Projeto</label>
+                        <div class="input-group">
+                            <select class="form-select" id="projeto_id" name="projeto_id" required>
+                                <option value="">Selecione um projeto</option>
+                                {% for projeto in projetos %}
+                                <option value="{{ projeto.id_projeto }}">{{ projeto.codigo_projeto }} - {{ projeto.nome_projeto }}</option>
+                                {% endfor %}
+                            </select>
+                            <a href="{{ url_for('criar_projeto') }}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-plus"></i> Novo Projeto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="tipo" class="form-label">Tipo</label>
+                        <select class="form-select" id="tipo" name="tipo" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="BUG">Bug</option>
+                            <option value="MELHORIA">Melhoria</option>
+                            <option value="TAREFA">Tarefa</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="prioridade" class="form-label">Prioridade</label>
+                        <select class="form-select" id="prioridade" name="prioridade" required>
+                            <option value="">Selecione a prioridade</option>
+                            <option value="ALTA">Alta</option>
+                            <option value="MÉDIA">Média</option>
+                            <option value="BAIXA">Baixa</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="">Selecione o status</option>
+                            <option value="ABERTO">Aberto</option>
+                            <option value="EM_ANÁLISE">Em Análise</option>
+                            <option value="EM_ANDAMENTO">Em Andamento</option>
+                            <option value="RESOLVIDO">Resolvido</option>
+                            <option value="FECHADO">Fechado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="solucao" class="form-label">Solução</label>
+                    <textarea class="form-control" id="solucao" name="solucao" rows="4"></textarea>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualizar o título da página quando um novo projeto for criado
+    window.addEventListener('focus', function() {
+        // Recarregar a lista de projetos
+        fetch('/api/projetos')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('projeto_id');
+                const currentValue = select.value;
+                
+                // Limpar opções existentes, mantendo a primeira
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // Adicionar novas opções
+                data.forEach(projeto => {
+                    const option = document.createElement('option');
+                    option.value = projeto.id_projeto;
+                    option.textContent = `${projeto.codigo_projeto} - ${projeto.nome_projeto}`;
+                    select.appendChild(option);
+                });
+                
+                // Restaurar valor selecionado
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">Projetos</h1>
+        <a href="{{ url_for('criar_projeto') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Projeto
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="situacao" class="form-label">Situação</label>
+                    <select class="form-select" id="situacao" name="situacao">
+                        <option value="">Todas</option>
+                        <option value="ATIVO" {% if request.args.get('situacao') == 'ATIVO' %}selected{% endif %}>Ativo</option>
+                        <option value="CONCLUIDO" {% if request.args.get('situacao') == 'CONCLUIDO' %}selected{% endif %}>Concluído</option>
+                        <option value="CANCELADO" {% if request.args.get('situacao') == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ request.args.get('search', '') }}" 
+                           placeholder="Código ou nome do projeto">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Projetos -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Situação</th>
+                            <th>Data Início</th>
+                            <th>Data Fim Prevista</th>
+                            <th>Última Atualização</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for projeto in projetos %}
+                        <tr>
+                            <td>{{ projeto.codigo_projeto }}</td>
+                            <td>{{ projeto.nome_projeto }}</td>
+                            <td>
+                                <span class="badge {% if projeto.situacao_projeto == 'ATIVO' %}bg-success
+                                    {% elif projeto.situacao_projeto == 'CONCLUIDO' %}bg-info
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ projeto.situacao_projeto }}
+                                </span>
+                            </td>
+                            <td>{{ projeto.data_inicio.strftime('%d/%m/%Y') if projeto.data_inicio else 'Não definida' }}</td>
+                            <td>{{ projeto.data_fim_prevista.strftime('%d/%m/%Y') if projeto.data_fim_prevista else 'Não definida' }}</td>
+                            <td>{{ projeto.data_ultima_atualizacao.strftime('%d/%m/%Y %H:%M') if projeto.data_ultima_atualizacao else 'Não atualizado' }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('visualizar_projeto', id=projeto.id_projeto) }}" 
+                                       class="btn btn-sm btn-info" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_projeto', id=projeto.id_projeto) }}" 
+                                       class="btn btn-sm btn-primary" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" title="Excluir"
+                                            onclick="confirmarExclusao({{ projeto.id_projeto }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Navegação de páginas" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('listar_projetos', page=pagination.prev_num, **request.args) }}">Anterior</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page in pagination.iter_pages() %}
+                        {% if page %}
+                            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('listar_projetos', page=page, **request.args) }}">{{ page }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('listar_projetos', page=pagination.next_num, **request.args) }}">Próxima</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExclusao" tabindex="-1" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExclusaoLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este projeto?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmarExclusao(id) {
+    const modal = new bootstrap.Modal(document.getElementById('modalExclusao'));
+    const form = document.getElementById('formExclusao');
+    form.action = `/projetos/${id}/excluir`;
+    modal.show();
+}
+</script>
+{% endblock %} 
