@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: portal-projetos
+    env: docker
+    plan: free
+    autoDeploy: false  # o deploy será disparado pelo GitHub Actions (hook)
