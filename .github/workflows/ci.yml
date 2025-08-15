@@ -1,0 +1,33 @@
+name: CI - Python/Flask
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"   # cache automático do pip
+      - run: pip install -r requirements.txt
+      # Opcional: linters (substitua por ruff/flake8 se quiser)
+      - run: pip install ruff
+      - run: ruff check .
+      # Testes (só roda se existir a pasta tests)
+      - name: Run pytest if tests exist
+        run: |
+          if [ -d tests ]; then
+            pip install pytest
+            pytest -q
+          else
+            echo "No tests directory. Skipping."
+          fi
